@@ -1,27 +1,918 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Monish World</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Name - Engineer & Developer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Circuit Background */
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 100, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 255, 100, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0f0a 0%, #050a05 50%, #000500 100%);
+        }
+
+        .circuit-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .circuit-path {
+            fill: none;
+            stroke: #00ff44;
+            stroke-width: 2;
+            opacity: 0.6;
+            filter: drop-shadow(0 0 3px #00ff44);
+        }
+
+        .circuit-flow {
+            fill: #00ffff;
+            opacity: 0;
+            animation: flow 4s ease-in-out infinite;
+        }
+
+        .circuit-flow.delay-1 { animation-delay: 0s; }
+        .circuit-flow.delay-2 { animation-delay: 1s; }
+        .circuit-flow.delay-3 { animation-delay: 2s; }
+        .circuit-flow.delay-4 { animation-delay: 3s; }
+
+        @keyframes flow {
+            0% { opacity: 0; r: 2; }
+            25% { opacity: 1; r: 4; }
+            50% { opacity: 1; r: 3; }
+            75% { opacity: 1; r: 4; }
+            100% { opacity: 0; r: 2; }
+        }
+
+        /* Circuit Components */
+        .circuit-component {
+            position: absolute;
+            background: #001100;
+            border: 2px solid #00ff44;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .resistor {
+            width: 40px;
+            height: 15px;
+            background: linear-gradient(90deg, #002200, #004400, #002200);
+        }
+
+        .capacitor {
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(0deg, #000022, #000044, #000022);
+            border-radius: 2px;
+        }
+
+        .chip {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(45deg, #001a00, #003300, #001a00);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .chip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #ff4400;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4400;
+            animation: chipPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes chipPulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        /* Position circuit components */
+        .resistor.r1 { top: 15%; left: 20%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 0.5s; }
+        .resistor.r2 { top: 60%; left: 70%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 2s; }
+        .resistor.r3 { top: 80%; left: 30%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 3.5s; }
+
+        .capacitor.c1 { top: 35%; left: 15%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 1s; }
+        .capacitor.c2 { top: 45%; left: 80%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 2.5s; }
+
+        .chip.ic1 { top: 25%; left: 60%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 1.5s; }
+        .chip.ic2 { top: 70%; left: 50%; animation: componentGlow 3s ease-in-out infinite; animation-delay: 3s; }
+
+        @keyframes componentGlow {
+            0%, 100% { 
+                border-color: #00ff44; 
+                box-shadow: 0 0 5px rgba(0, 255, 68, 0.3); 
+            }
+            50% { 
+                border-color: #00ffff; 
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 68, 0.4); 
+            }
+        }
+
+        /* Oscilloscope Lines */
+        .oscilloscope {
+            position: absolute;
+            bottom: 10%;
+            right: 5%;
+            width: 200px;
+            height: 100px;
+            border: 2px solid #00ff44;
+            background: rgba(0, 20, 0, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .oscilloscope-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ffff;
+            transform-origin: left bottom;
+            animation: oscilloscope 2s ease-in-out infinite;
+        }
+
+        @keyframes oscilloscope {
+            0% { transform: scaleX(0) translateY(0); }
+            25% { transform: scaleX(0.3) translateY(-20px); }
+            50% { transform: scaleX(0.6) translateY(-40px); }
+            75% { transform: scaleX(0.9) translateY(-20px); }
+            100% { transform: scaleX(1) translateY(0); }
+        }
+
+        /* Data Flow Particles */
+        .data-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ffff;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #00ffff;
+            animation: dataFlow 6s linear infinite;
+        }
+
+        .particle-1 { top: 20%; animation-delay: 0s; }
+        .particle-2 { top: 40%; animation-delay: 1.5s; }
+        .particle-3 { top: 60%; animation-delay: 3s; }
+        .particle-4 { top: 80%; animation-delay: 4.5s; }
+
+        @keyframes dataFlow {
+            0% { left: -10px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 110%; opacity: 0; }
+        }
+
+        /* Power indicator */
+        .power-indicator {
+            position: absolute;
+            top: 5%;
+            right: 5%;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: powerBlink 1.5s ease-in-out infinite;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        @keyframes powerBlink {
+            0%, 100% { opacity: 1; background: #ff0000; }
+            50% { opacity: 0.3; background: #440000; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #00ff88;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            border: 1px solid #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #333;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 150, 255, 0.1));
+            border: 2px solid #00ff88;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin-bottom: 1rem;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .hero .tagline {
+            font-size: 1.2rem;
+            color: #00aaff;
+            margin-bottom: 2rem;
+            animation: typewriter 4s steps(40) 1s both;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #00ff88;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            100% { text-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.6); }
+        }
+
+        @keyframes typewriter {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        /* Section Headers */
+        h2 {
+            color: #00ff88;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #00ff88;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00aaff;
+            animation: expandLine 2s ease-out forwards;
+        }
+
+        @keyframes expandLine {
+            100% { width: 100px; }
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .project-card {
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            border-color: #00aaff;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .project-card h3 {
+            color: #00aaff;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .project-card p {
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-tag {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid #00ff88;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .project-links a {
+            color: #00aaff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00aaff;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .project-links a:hover {
+            background: rgba(0, 170, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
+        }
+
+        /* Blog Section */
+        .blog-posts {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .blog-post {
+            background: rgba(0, 30, 60, 0.6);
+            border-left: 4px solid #00ff88;
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .blog-post:hover {
+            background: rgba(0, 30, 60, 0.8);
+            transform: translateX(10px);
+        }
+
+        .blog-post h3 {
+            color: #00aaff;
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-date {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #333;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .contact-item a {
+            color: #00aaff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-item a:hover {
+            color: #00ff88;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            .hero .tagline {
+                white-space: normal;
+                animation: none;
+                border-right: none;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00aaff;
+        }
+    </style>
 </head>
 <body>
-	<canvas id="bg"></canvas>   
-	<main>
-		<header>
-			<h1>Monish Ramadoss</h1>
-			<p>🚀 Welcome to my world!</p>
-		</header>
-	</main>
+    <!-- Animated Circuit Background -->
+    <div class="circuit-bg">
+        <!-- SVG Circuit Diagram -->
+        <svg class="circuit-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+            <!-- Main circuit paths -->
+            <path class="circuit-path" d="M 100 200 L 300 200 L 300 400 L 600 400 L 600 200 L 800 200 L 800 600 L 1200 600 L 1200 300 L 1500 300" 
+                  stroke-dasharray="5,5" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" values="0;-10" dur="0.5s" repeatCount="indefinite"/>
+            </path>
+            
+            <path class="circuit-path" d="M 200 100 L 200 300 L 500 300 L 500 500 L 900 500 L 900 250 L 1300 250 L 1300 700" 
+                  stroke-dasharray="3,7" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" values="0;-10" dur="0.7s" repeatCount="indefinite"/>
+            </path>
+            
+            <path class="circuit-path" d="M 50 600 L 400 600 L 400 800 L 700 800 L 700 450 L 1100 450 L 1100 750 L 1600 750" 
+                  stroke-dasharray="4,6" stroke-dashoffset="0">
+                <animate attributeName="stroke-dashoffset" values="0;-10" dur="0.6s" repeatCount="indefinite"/>
+            </path>
 
+            <!-- Circuit junction points with animated flow -->
+            <circle class="circuit-flow delay-1" cx="300" cy="200" r="3">
+                <animate attributeName="r" values="2;6;2" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            
+            <circle class="circuit-flow delay-2" cx="600" cy="400" r="3">
+                <animate attributeName="r" values="2;6;2" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            
+            <circle class="circuit-flow delay-3" cx="900" cy="500" r="3">
+                <animate attributeName="r" values="2;6;2" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
 
-	<blockquote>
-        <p>I like making stuff and putting it on the internet</p>
-	</blockquote>
+            <circle class="circuit-flow delay-4" cx="1200" cy="300" r="3">
+                <animate attributeName="r" values="2;6;2" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+            </circle>
 
-	<a href="ref.html" target="_self"> vk_resources </a>
+            <!-- Additional flowing circuits -->
+            <path class="circuit-path" d="M 0 400 Q 200 300 400 400 T 800 400 Q 1000 300 1200 400 T 1920 400" 
+                  stroke-width="1" opacity="0.4" stroke="#00aa44">
+                <animate attributeName="stroke-dashoffset" values="0;-20" dur="3s" repeatCount="indefinite"/>
+            </path>
+        </svg>
 
+        <!-- Circuit Components -->
+        <div class="circuit-component resistor r1"></div>
+        <div class="circuit-component resistor r2"></div>
+        <div class="circuit-component resistor r3"></div>
+        
+        <div class="circuit-component capacitor c1"></div>
+        <div class="circuit-component capacitor c2"></div>
+        
+        <div class="circuit-component chip ic1"></div>
+        <div class="circuit-component chip ic2"></div>
+
+        <!-- Data Flow Particles -->
+        <div class="data-particle particle-1"></div>
+        <div class="data-particle particle-2"></div>
+        <div class="data-particle particle-3"></div>
+        <div class="data-particle particle-4"></div>
+
+        <!-- Oscilloscope Display -->
+        <div class="oscilloscope">
+            <div class="oscilloscope-line"></div>
+        </div>
+
+        <!-- Power Indicator -->
+        <div class="power-indicator"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Your Name</h1>
+            <div class="tagline">Engineer • Developer • Problem Solver</div>
+            <p>Building the future, one line of code at a time</p>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <h2>About</h2>
+            <p>
+                I'm a passionate engineer and developer with a love for creating innovative solutions. 
+                My expertise spans across multiple programming languages and technologies, with a focus on 
+                building scalable, efficient, and elegant systems. When I'm not coding, you'll find me 
+                exploring new technologies, contributing to open source projects, or diving deep into 
+                engineering challenges.
+            </p>
+            <p>
+                I believe in the power of clean code, thoughtful design, and continuous learning. 
+                Every project is an opportunity to push boundaries and create something meaningful.
+            </p>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects">
+            <h2>Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>Project Alpha</h3>
+                    <p>A revolutionary web application that streamlines developer workflows with automated testing and deployment pipelines.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">AWS</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#">GitHub</a>
+                        <a href="#">Live Demo</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Circuit Simulator</h3>
+                    <p>An interactive circuit design and simulation tool built with modern web technologies, perfect for electrical engineering students.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">WebGL</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Canvas</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#">GitHub</a>
+                        <a href="#">Live Demo</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>Data Pipeline Engine</h3>
+                    <p>A robust data processing pipeline that handles millions of records daily with real-time analytics and monitoring.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">Python</span>
+                        <span class="tech-tag">Apache Kafka</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">Redis</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#">GitHub</a>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <h3>IoT Sensor Network</h3>
+                    <p>A distributed sensor network for environmental monitoring with real-time data visualization and alerting systems.</p>
+                    <div class="tech-stack">
+                        <span class="tech-tag">C++</span>
+                        <span class="tech-tag">Arduino</span>
+                        <span class="tech-tag">MQTT</span>
+                        <span class="tech-tag">InfluxDB</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#">GitHub</a>
+                        <a href="#">Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog">
+            <h2>Blog</h2>
+            <div class="blog-posts">
+                <article class="blog-post">
+                    <h3>The Evolution of Circuit Design: From Breadboards to Digital Twins</h3>
+                    <div class="blog-date">July 15, 2025</div>
+                    <p>
+                        Exploring how circuit design has transformed from physical prototyping to sophisticated 
+                        digital simulation environments. A deep dive into the tools and methodologies that are 
+                        shaping the future of electrical engineering.
+                    </p>
+                </article>
+
+                <article class="blog-post">
+                    <h3>Building Scalable APIs: Lessons from the Trenches</h3>
+                    <div class="blog-date">July 8, 2025</div>
+                    <p>
+                        My journey through the challenges of scaling APIs from hundreds to millions of requests. 
+                        Key insights on architecture decisions, performance optimization, and maintaining 
+                        reliability at scale.
+                    </p>
+                </article>
+
+                <article class="blog-post">
+                    <h3>The Art of Clean Code: Engineering for Humans</h3>
+                    <div class="blog-date">June 30, 2025</div>
+                    <p>
+                        Why writing code is not just about making machines understand, but creating systems 
+                        that humans can read, maintain, and evolve. Principles and practices for crafting 
+                        elegant solutions.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact">
+            <h2>Contact</h2>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <h3>Email</h3>
+                    <a href="mailto:your.email@example.com">your.email@example.com</a>
+                </div>
+                <div class="contact-item">
+                    <h3>GitHub</h3>
+                    <a href="https://github.com/yourusername" target="_blank">@yourusername</a>
+                </div>
+                <div class="contact-item">
+                    <h3>LinkedIn</h3>
+                    <a href="https://linkedin.com/in/yourprofile" target="_blank">Your Profile</a>
+                </div>
+                <div class="contact-item">
+                    <h3>Twitter</h3>
+                    <a href="https://twitter.com/yourusername" target="_blank">@yourusername</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Enhanced circuit effects
+        function createElectricalSpark() {
+            const spark = document.createElement('div');
+            spark.style.position = 'absolute';
+            spark.style.width = '2px';
+            spark.style.height = '2px';
+            spark.style.background = '#00ffff';
+            spark.style.borderRadius = '50%';
+            spark.style.boxShadow = '0 0 10px #00ffff';
+            spark.style.pointerEvents = 'none';
+            spark.style.zIndex = '1';
+            
+            // Random position
+            spark.style.top = Math.random() * window.innerHeight + 'px';
+            spark.style.left = Math.random() * window.innerWidth + 'px';
+            
+            // Fade out animation
+            spark.style.animation = 'sparkFade 0.5s ease-out forwards';
+            
+            document.querySelector('.circuit-bg').appendChild(spark);
+            
+            setTimeout(() => {
+                spark.remove();
+            }, 500);
+        }
+
+        // Add CSS for spark animation
+        const sparkStyle = document.createElement('style');
+        sparkStyle.textContent = `
+            @keyframes sparkFade {
+                0% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0; transform: scale(3); }
+            }
+        `;
+        document.head.appendChild(sparkStyle);
+
+        // Create electrical sparks periodically
+        setInterval(createElectricalSpark, 2000);
+
+        // Add mouse interaction with circuit
+        document.addEventListener('mousemove', (e) => {
+            const components = document.querySelectorAll('.circuit-component');
+            components.forEach(component => {
+                const rect = component.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const distance = Math.sqrt(
+                    Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2)
+                );
+                
+                if (distance < 100) {
+                    component.style.transform = 'scale(1.1)';
+                    component.style.filter = 'brightness(1.5) drop-shadow(0 0 10px #00ffff)';
+                } else {
+                    component.style.transform = 'scale(1)';
+                    component.style.filter = 'none';
+                }
+            });
+        });
+
+        // Circuit diagnostic messages
+        const diagnosticMessages = [
+            'SYSTEM ONLINE',
+            'VOLTAGE: 5.0V',
+            'CURRENT: 2.3A',
+            'TEMPERATURE: 42°C',
+            'FREQUENCY: 60Hz',
+            'STATUS: NOMINAL'
+        ];
+
+        function showDiagnostic() {
+            const diagnostic = document.createElement('div');
+            diagnostic.textContent = diagnosticMessages[Math.floor(Math.random() * diagnosticMessages.length)];
+            diagnostic.style.position = 'fixed';
+            diagnostic.style.top = '10px';
+            diagnostic.style.right = '10px';
+            diagnostic.style.background = 'rgba(0, 0, 0, 0.8)';
+            diagnostic.style.color = '#00ff44';
+            diagnostic.style.padding = '5px 10px';
+            diagnostic.style.border = '1px solid #00ff44';
+            diagnostic.style.borderRadius = '4px';
+            diagnostic.style.fontFamily = 'Courier New, monospace';
+            diagnostic.style.fontSize = '12px';
+            diagnostic.style.zIndex = '1000';
+            diagnostic.style.animation = 'diagnosticFade 3s ease-out forwards';
+            
+            document.body.appendChild(diagnostic);
+            
+            setTimeout(() => {
+                diagnostic.remove();
+            }, 3000);
+        }
+
+        // Add diagnostic fade animation
+        const diagnosticStyle = document.createElement('style');
+        diagnosticStyle.textContent = `
+            @keyframes diagnosticFade {
+                0% { opacity: 0; transform: translateX(100%); }
+                10% { opacity: 1; transform: translateX(0); }
+                90% { opacity: 1; transform: translateX(0); }
+                100% { opacity: 0; transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(diagnosticStyle);
+
+        // Show diagnostic messages periodically
+        setInterval(showDiagnostic, 5000);
+
+        // Add intersection observer for section animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for scroll animations
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Add circuit power-up sequence on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.circuit-path').forEach((path, index) => {
+                    setTimeout(() => {
+                        path.style.strokeWidth = '3';
+                        path.style.filter = 'drop-shadow(0 0 8px #00ff44)';
+                        path.style.transition = 'all 0.5s ease';
+                    }, index * 200);
+                });
+            }, 500);
+        });
+    </script>
 </body>
 </html>
-
-
